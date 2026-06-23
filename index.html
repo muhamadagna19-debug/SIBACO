@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SIBACO</title>
+    <title>SIBACO - iOS Edition</title>
     <style>
         :root {
             --bg-color: #0f0f0f;
@@ -15,187 +15,70 @@
             --text: #ffffff;
             --text-dim: #b0bec5;
             --border: #333;
-            --app-font: system-ui, -apple-system, sans-serif;
         }
 
-        body.light-mode {
-            --bg-color: #f5f5f5;
-            --surface: #ffffff;
-            --card-bg: #f9f9f9;
-            --text: #212121;
-            --text-dim: #757575;
-            --border: #ddd;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text); padding: 15px; }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--app-font); }
-        body { background-color: var(--bg-color); color: var(--text); padding: 15px; transition: background 0.3s; }
-        
-        button, input, select, .btn, .settings-btn { touch-action: manipulation; }
+        header { display: flex; align-items: center; gap: 10px; padding: 10px 0 20px; border-bottom: 1px solid var(--border); }
+        header img { height: 35px; width: auto; }
+        .title-area { display: flex; flex-direction: column; }
+        .title-main { color: var(--primary); font-size: 1.2rem; font-weight: 900; }
+        .title-sub { font-size: 0.5rem; color: var(--text-dim); font-weight: bold; }
 
-        header { display: flex; justify-content: space-between; align-items: center; padding: 10px 0 20px; }
-        
-        .logo-area { display: flex; align-items: center; gap: 8px; justify-content: flex-start; flex-wrap: nowrap; }
-        .logo-area img { height: 35px; width: auto; border-radius: 4px; object-fit: contain; flex-shrink: 0; }
-        
-        .logo-light { display: none; }
-        .logo-dark { display: block; }
-        body.light-mode .logo-dark { display: none; }
-        body.light-mode .logo-light { display: block; }
-
-        .settings-btn { cursor: pointer; padding: 8px; fill: var(--text-dim); transition: 0.2s; display: flex; align-items: center; justify-content: center; flex-shrink: 0;}
-
-        #settingsDrawer, #infoDrawer { 
-            display: none; background: var(--surface); border-radius: 12px; padding: 15px; 
-            margin-bottom: 20px; border: 1px solid var(--border); animation: slideDown 0.3s ease-out;
-        }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .info-text { font-size: 0.8rem; color: var(--text-dim); line-height: 1.6; }
-        .info-text strong { color: var(--text); }
-        .info-link { color: var(--primary); text-decoration: none; font-weight: bold; }
-
-        .section { background: var(--surface); border-radius: 16px; padding: 18px; margin-bottom: 20px; border: 1px solid var(--border); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h2 { font-size: 0.9rem; margin-bottom: 12px; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; }
+        .section { background: var(--surface); border-radius: 12px; padding: 15px; margin-top: 15px; border: 1px solid var(--border); }
+        h2 { font-size: 0.85rem; margin-bottom: 12px; color: var(--primary); text-transform: uppercase; }
 
         .grid-form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .full { grid-column: span 2; }
-        label { display: block; font-size: 0.65rem; color: var(--text-dim); margin-bottom: 3px; font-weight: bold; }
-        input, select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text); font-size: 0.9rem; }
+        label { display: block; font-size: 0.65rem; color: var(--text-dim); margin-bottom: 4px; font-weight: bold; }
+        input, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text); font-size: 0.9rem; -webkit-appearance: none; }
 
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-weight: 800; cursor: pointer; text-transform: uppercase; margin-top: 10px; font-size: 0.9rem; }
-        .btn-primary { background: var(--primary); color: #000; }
-        .btn-outline { background: none; border: 1px solid var(--text-dim); color: var(--text-dim); padding: 6px 12px; font-size: 0.7rem; width: auto; }
-        .preset-btn { padding: 4px 8px; flex: 1; text-align: center; border-radius: 4px; border-color: var(--border); }
-
-        .p-card { background: var(--card-bg); border-radius: 15px; padding: 15px; border-left: 6px solid var(--success); margin-bottom: 12px; position: relative; transition: transform 0.2s; }
-        .p-card.warning { border-left-color: var(--primary); }
-        .p-card.danger { border-left-color: var(--danger); animation: dangerPulse 0.5s infinite alternate; }
-        @keyframes dangerPulse { from { box-shadow: 0 0 0px transparent; } to { box-shadow: 0 0 15px var(--danger); background: #ff17441a; } }
-
-        .big-timer { font-size: 3rem; font-weight: 900; text-align: center; margin: 5px 0; font-variant-numeric: tabular-nums; }
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 0.9rem; touch-action: manipulation; }
+        .btn-primary { background: var(--primary); color: #000; margin-top: 10px; }
         
-        .progress-bar { width: 100%; height: 8px; background: var(--border); border-radius: 4px; margin: 10px 0; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--success); transition: width 1s linear, background 0.3s; }
+        .p-card { background: var(--card-bg); border-radius: 12px; padding: 15px; border-left: 5px solid var(--success); margin-bottom: 10px; }
+        .p-card.warning { border-left-color: var(--primary); }
+        .p-card.danger { border-left-color: var(--danger); background: #3d141d; animation: flash 1s infinite alternate; }
+        @keyframes flash { from { box-shadow: 0 0 0px transparent; } to { box-shadow: 0 0 15px var(--danger); } }
 
-        .stats-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 8px; }
-        .stat-box { background: var(--bg-color); padding: 8px; border-radius: 8px; text-align: center; }
-        .stat-box small { color: var(--text-dim); display: block; font-size: 0.55rem; text-transform: uppercase; }
-        .stat-box span { font-size: 0.85rem; font-weight: bold; transition: color 0.3s; }
+        .big-timer { font-size: 2.8rem; font-weight: bold; text-align: center; margin: 8px 0; font-variant-numeric: tabular-nums; }
+        .progress-bar { width: 100%; height: 6px; background: var(--border); border-radius: 3px; margin-bottom: 10px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--success); }
 
-        .log-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; text-align: left; }
-        .log-table th, .log-table td { padding: 8px; border-bottom: 1px solid var(--border); color: var(--text-dim); }
-
-        .color-presets { display: flex; gap: 10px; margin-top: 5px; }
-        .color-dot { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2px solid #fff; }
+        .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+        .stat-box { background: var(--bg-color); padding: 6px; border-radius: 6px; text-align: center; font-size: 0.75rem; }
+        .stat-box small { color: var(--text-dim); display: block; font-size: 0.55rem; text-transform: uppercase; margin-bottom: 2px; }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo-area">
-            <img src="https://i.ibb.co.com/YFMpjRNN/Gemini-Generated-Image-80zl6080zl6080zl-Photoroom.png" alt="Logo Pemprov DKI">
-            <img src="https://i.ibb.co.com/V0nP5sF7/logo-night-mode-Photoroom-1.png" alt="Logo SIBACO" class="logo-dark">
-            <img src="https://i.ibb.co.com/h1Jf490d/logo-day-mode-Photoroom-1.png" alt="Logo SIBACO" class="logo-light">
-            
-            <div style="display: flex; flex-direction: column; justify-content: center; margin-left: 2px;">
-                <span style="color: var(--primary); font-size: 1.1rem; font-weight: 900; line-height: 1;">SIBACO</span>
-                <span style="font-size: 0.45rem; color: var(--text-dim); letter-spacing: 0.5px; font-weight: bold; max-width: 130px; line-height: 1.2; margin-top: 2px;">SISTEM BREATHING APPARATUS CONTROL</span>
-            </div>
-        </div>
-
-        <div style="display: flex; gap: 5px; flex-shrink: 0;">
-            <div class="settings-btn" onclick="toggleInfo()">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--text-dim)"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
-            </div>
-            <div class="settings-btn" onclick="toggleSettings()">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--text-dim)"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-            </div>
+        <img src="https://i.ibb.co.com/YFMpjRNN/Gemini-Generated-Image-80zl6080zl6080zl-Photoroom.png" alt="DKI">
+        <img src="https://i.ibb.co.com/V0nP5sF7/logo-night-mode-Photoroom-1.png" alt="SIBACO">
+        <div class="title-area">
+            <span class="title-main">SIBACO</span>
+            <span class="title-sub">SISTEM BREATHING APPARATUS CONTROL</span>
         </div>
     </header>
 
-    <div id="infoDrawer">
-        <h2 style="margin:0 0 10px 0;">ℹ️ Tentang Aplikasi</h2>
-        <div class="info-text">
-            <strong>SIBACO (Sistem Breathinng Apparatus Control)</strong><br>
-            Versi: 1.0.0 (Rancangan Aktualisasi Latsar CPNS)<br><br>
-            
-            <strong>Pengembang:</strong><br>
-            Muhamad Agna Fadilah - Pemadam Kebakaran Pemula - Regu C<br>
-            Sektor X Cipayung - Dinas Gulkarmat DKI Jakarta<br><br>
-            
-            <strong>Kontak & Bantuan:</strong><br>
-            Email: <a href="mailto:muhamadagna19@gmail.com" class="info-link">muhamadagna19@gmail.com</a><br>
-            WhatsApp: <a href="https://wa.me/6282117081059" target="_blank" class="info-link">0821-1708-1059</a>
-        </div>
-    </div>
-
-    <div id="settingsDrawer">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h2 style="margin:0">Pengaturan</h2>
-            <button class="btn-outline" onclick="toggleTheme()">🌓 Mode</button>
-        </div>
-        <div class="grid-form">
-            <div class="form-group">
-                <label>Ukuran Teks</label>
-                <div style="display: flex; gap: 5px;">
-                    <button class="btn-outline preset-btn" onclick="changeFontSize(-1)" style="font-weight: bold; font-size: 0.9rem;">A -</button>
-                    <button class="btn-outline preset-btn" onclick="changeFontSize(1)" style="font-weight: bold; font-size: 1.1rem;">A +</button>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Gaya Font</label>
-                <select id="fontStyle" onchange="changeFontFamily(this.value)">
-                    <option value="system-ui, -apple-system, sans-serif">Modern (Default)</option>
-                    <option value="Arial, Helvetica, sans-serif">Standar (Arial)</option>
-                    <option value="'Courier New', Courier, monospace">Digital (Mono)</option>
-                    <option value="Georgia, serif">Klasik (Serif)</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Nada Alarm</label>
-                <select id="alarmTone" onchange="testSound()">
-                    <option value="siren_panjang">Sirine</option>
-                    <option value="siren">Alarm Elektronik</option>
-                    <option value="beep">Bip Standar</option>
-                    <option value="sonar">Pulsa Sonar</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label>Batas Margin (Bar)</label>
-                <input type="number" inputmode="numeric" pattern="[0-9]*" id="marginSetting" value="50" min="20" max="100">
-            </div>
-            
-            <div class="form-group full">
-                <label>Warna Aksen</label>
-                <div class="color-presets">
-                    <div class="color-dot" style="background: #ffa000;" onclick="changeColor('#ffa000')"></div>
-                    <div class="color-dot" style="background: #2196f3;" onclick="changeColor('#2196f3')"></div>
-                    <div class="color-dot" style="background: #00e676;" onclick="changeColor('#00e676')"></div>
-                    <div class="color-dot" style="background: #f44336;" onclick="changeColor('#f44336')"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="section">
-        <h2>➕ Data Personel</h2>
+        <h2>➕ Registrasi Masuk</h2>
         <div class="grid-form">
-            <div class="form-group"><label>Nama Personel</label><input type="text" id="name" placeholder="Contoh: Budi"></div>
-            <div class="form-group"><label>Regu / Sektor</label><input type="text" id="regu" placeholder="Contoh: Regu C / Sektor X Cipayung"></div>
+            <div class="form-group full"><label>Nama Personel</label><input type="text" id="name" placeholder="Nama Petugas"></div>
+            <div class="form-group"><label>Regu / Sektor</label><input type="text" id="regu" placeholder="Contoh: Regu C"></div>
             
             <div class="form-group">
                 <label>Volume Tabung (L)</label>
                 <select id="vol">
-                    <option value="6.8" selected>6.8 Liter</option>
+                    <option value="6.8" selected>6.8 Liter (Standar)</option>
                     <option value="6.0">6.0 Liter</option>
                     <option value="9.0">9.0 Liter</option>
                 </select>
             </div>
             
-            <div class="form-group"><label>Beban Kerja (LPM)</label>
+            <div class="form-group">
+                <label>Beban Kerja (LPM)</label>
                 <select id="lpm">
                     <option value="40" selected>Ringan (40 LPM)</option>
                     <option value="50">Sedang (50 LPM)</option>
@@ -203,202 +86,71 @@
                 </select>
             </div>
 
-            <div class="form-group full">
-                <label>Tekanan Awal (Bar)</label>
-                <input type="number" inputmode="numeric" pattern="[0-9]*" id="press" placeholder="Masukkan Tekanan (Min 50)" min="50" max="300">
-                <div style="display: flex; gap: 8px; margin-top: 6px;">
-                    <button class="btn-outline preset-btn" onclick="document.getElementById('press').value=200">200 B</button>
-                    <button class="btn-outline preset-btn" onclick="document.getElementById('press').value=250">250 B</button>
-                    <button class="btn-outline preset-btn" onclick="document.getElementById('press').value=300">300 B</button>
-                </div>
-            </div>
-
-            <div class="form-group full"><label>Waktu Masuk</label><input type="time" id="entryTime"></div>
+            <div class="form-group"><label>Tekanan Awal (Bar)</label><input type="number" inputmode="numeric" pattern="[0-9]*" id="press" placeholder="Contoh: 250"></div>
+            <div class="form-group"><label>Batas Aman (Bar)</label><input type="number" inputmode="numeric" pattern="[0-9]*" id="margin" value="50"></div>
         </div>
         <button class="btn btn-primary" onclick="addPerson()">MULAI PEMANTAUAN</button>
     </div>
 
     <div class="section">
-        <h2>📟 Monitor Operasi Aktif</h2>
+        <h2>📟 Monitor Aktif</h2>
         <div id="monitorList"></div>
-        <div id="noActive" style="text-align: center; color: var(--text-dim); padding: 10px; font-size: 0.8rem;">Tidak ada personel yang berada di area operasi.</div>
+        <div id="noActive" style="text-align: center; color: var(--text-dim); padding: 10px; font-size: 0.8rem;">Tidak ada personel aktif.</div>
     </div>
 
-    <div class="section">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <h2>📜 Riwayat Evakuasi</h2>
-            <div style="display: flex; gap: 5px;">
-                <button class="btn-outline" style="border-color: var(--success); color: var(--success);" onclick="shareExcelToWA()">Kirim ke WA (Excel)</button>
-                <button class="btn-outline" style="border-color: var(--danger); color: var(--danger);" onclick="clearLogs()">Hapus</button>
-            </div>
-        </div>
-        <div style="overflow-x: auto;">
-            <table class="log-table">
-                <thead><tr><th>Personel</th><th>Regu</th><th>Durasi</th><th>Aksi</th></tr></thead>
-                <tbody id="logBody"></tbody>
-            </table>
-        </div>
-    </div>
+    <audio id="iosKeepAlive" loop playsinline src="data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjkxLjEwMAAAAAAAAAAAAAAA//uQZAAAAAAAABMAAAAAAAABMAAABSAAAAEwAAAAAAAABMAAAASFVWAAAAAAAEgAAAAAAADgAAAAAAA+H"></audio>
 
     <script>
-        document.addEventListener('contextmenu', event => event.preventDefault());
-        
         let persons = [];
-        let logs = [];
-        try {
-            persons = JSON.parse(localStorage.getItem('sibaco_active')) || [];
-            logs = JSON.parse(localStorage.getItem('sibaco_logs')) || [];
-        } catch(e) { console.warn("Penyimpanan dibatasi", e); }
+        let audioCtx = null;
 
-        function saveActivePersons() { 
-            try { localStorage.setItem('sibaco_active', JSON.stringify(persons)); } catch(e) {} 
-        }
-        function saveLogs() { 
-            try { localStorage.setItem('sibaco_logs', JSON.stringify(logs)); } catch(e) {} 
-        }
-
-        function getCurrentTime5() {
+        function getFormattedTime() {
             const d = new Date();
             return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
         }
 
-        let audioCtx = null;
-        let silentSource = null;
+        function forceiOSWake() {
+            const keepAlive = document.getElementById('iosKeepAlive');
+            keepAlive.play().catch(()=>{});
 
-        function unlockAudio() {
-            try {
-                if (!audioCtx) {
-                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                }
-                if (audioCtx.state === 'suspended') {
-                    audioCtx.resume();
-                }
-                if (!silentSource) {
-                    const buffer = audioCtx.createBuffer(1, 1, 22050);
-                    silentSource = audioCtx.createBufferSource();
-                    silentSource.buffer = buffer;
-                    silentSource.loop = true;
-                    silentSource.connect(audioCtx.destination);
-                    silentSource.start();
-                }
-            } catch(e) { console.warn("Modul Audio gagal dimuat", e); }
-        }
-
-        let wakeLock = null;
-        async function requestWakeLock() {
-            try {
-                if ('wakeLock' in navigator && wakeLock === null && document.visibilityState === 'visible') {
-                    wakeLock = await navigator.wakeLock.request('screen');
-                }
-            } catch (err) {}
-        }
-
-        function releaseWakeLock() {
-            if (wakeLock !== null) { wakeLock.release().then(() => wakeLock = null); }
-        }
-
-        document.addEventListener('visibilitychange', async () => {
-            if (wakeLock !== null && document.visibilityState === 'visible') {
-                wakeLock = null; 
-                if (persons.length > 0) await requestWakeLock();
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             }
-        });
-
-        document.getElementById('entryTime').value = getCurrentTime5();
-        
-        if(localStorage.getItem('lightMode') === 'true') document.body.classList.add('light-mode');
-        if(localStorage.getItem('themeColor')) changeColor(localStorage.getItem('themeColor'));
-        
-        let currentFontSize = parseInt(localStorage.getItem('sibaco_fontSize')) || 16;
-        document.documentElement.style.fontSize = currentFontSize + 'px';
-        
-        let savedFont = localStorage.getItem('sibaco_fontFamily');
-        if(savedFont) {
-            document.documentElement.style.setProperty('--app-font', savedFont);
-            document.getElementById('fontStyle').value = savedFont;
-        }
-        
-        if(persons.length > 0) {
-            render();
-        }
-        renderLogs();
-
-        function changeFontSize(step) {
-            currentFontSize += step;
-            if (currentFontSize < 12) currentFontSize = 12;
-            if (currentFontSize > 22) currentFontSize = 22;
-            document.documentElement.style.fontSize = currentFontSize + 'px';
-            try { localStorage.setItem('sibaco_fontSize', currentFontSize); } catch(e){}
-        }
-
-        function changeFontFamily(font) {
-            document.documentElement.style.setProperty('--app-font', font);
-            try { localStorage.setItem('sibaco_fontFamily', font); } catch(e){}
-        }
-
-        function toggleSettings() {
-            const settings = document.getElementById('settingsDrawer');
-            const info = document.getElementById('infoDrawer');
-            if (info.style.display === 'block') info.style.display = 'none';
-            settings.style.display = settings.style.display === 'block' ? 'none' : 'block';
-        }
-
-        function toggleInfo() {
-            const info = document.getElementById('infoDrawer');
-            const settings = document.getElementById('settingsDrawer');
-            if (settings.style.display === 'block') settings.style.display = 'none';
-            info.style.display = info.style.display === 'block' ? 'none' : 'block';
-        }
-
-        function toggleTheme() {
-            const isLight = document.body.classList.toggle('light-mode');
-            try { localStorage.setItem('lightMode', isLight); } catch(e){}
-        }
-
-        function changeColor(hex) {
-            document.documentElement.style.setProperty('--primary', hex);
-            try { localStorage.setItem('themeColor', hex); } catch(e){}
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
         }
 
         function addPerson() {
-            try {
-                unlockAudio();
-                requestWakeLock();
+            forceiOSWake();
 
-                const name = document.getElementById('name').value.trim();
-                const regu = document.getElementById('regu').value.trim() || "-";
-                const press = parseInt(document.getElementById('press').value);
-                const vol = parseFloat(document.getElementById('vol').value);
-                const lpm = parseInt(document.getElementById('lpm').value);
-                
-                let timeIn = document.getElementById('entryTime').value;
-                if(!timeIn || !timeIn.includes(':')) timeIn = getCurrentTime5();
-                
-                const margin = parseInt(document.getElementById('marginSetting').value) || 50;
+            const name = document.getElementById('name').value.trim();
+            const regu = document.getElementById('regu').value.trim() || "-";
+            const press = parseInt(document.getElementById('press').value);
+            const vol = parseFloat(document.getElementById('vol').value);
+            const lpm = parseInt(document.getElementById('lpm').value);
+            const margin = parseInt(document.getElementById('margin').value) || 50;
 
-                if(!name || isNaN(press)) return alert("Harap lengkapi Nama dan Tekanan!");
-                if(press <= margin) return alert(`Tekanan terlalu rendah! Minimal harus di atas margin batas aman (${margin} Bar).`);
+            if (!name || isNaN(press)) return alert("Nama dan Tekanan Awal wajib diisi!");
+            if (press <= margin) return alert("Tekanan awal harus di atas batas aman!");
 
-                // Kalkulasi mundur berbasis rumus murni detik (Pure Countdown Logic)
-                const totalSec = Math.floor(((press - margin) * vol) / lpm * 60);
-                const parts = timeIn.split(':').map(Number);
-                const h = parts[0] || 0;
-                const m = parts[1] || 0;
-                const outMin = (h * 60) + m + Math.floor(totalSec / 60);
-                const timeOut = `${Math.floor(outMin/60)%24}:${(outMin%60).toString().padStart(2,'0')}`;
+            const totalSec = Math.floor(((press - margin) * vol) / lpm * 60);
+            const timeIn = getFormattedTime();
+            
+            // Waktu absolut
+            const targetTimeMs = Date.now() + (totalSec * 1000);
+            
+            const d = new Date(targetTimeMs);
+            const timeOut = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 
-                persons.push({
-                    id: Date.now(), name, regu, press, vol, lpm, margin, timeIn, timeOut,
-                    initialSeconds: totalSec, secondsLeft: totalSec 
-                });
+            persons.push({
+                id: Date.now(), name, regu, press, vol, lpm, margin, timeIn, timeOut,
+                initialSeconds: totalSec, targetTimeMs: targetTimeMs
+            });
 
-                saveActivePersons();
-                document.getElementById('name').value = '';
-                document.getElementById('press').value = '';
-                render();
-            } catch (err) {
-                alert("Kesalahan Tambah Data: " + err.message);
-            }
+            document.getElementById('name').value = '';
+            document.getElementById('press').value = '';
+            render();
         }
 
         function render() {
@@ -407,239 +159,106 @@
             list.innerHTML = '';
 
             persons.forEach(p => {
+                p.secondsLeft = Math.ceil((p.targetTimeMs - Date.now()) / 1000);
+                
                 const isDanger = p.secondsLeft <= 0;
                 const isWarning = p.secondsLeft > 0 && p.secondsLeft <= 300;
                 const status = isDanger ? 'danger' : (isWarning ? 'warning' : '');
                 
-                const calcSeconds = Math.max(0, p.secondsLeft); 
+                const calcSeconds = Math.max(0, p.secondsLeft);
                 const curPress = Math.max(p.margin, Math.floor((calcSeconds / p.initialSeconds) * (p.press - p.margin)) + p.margin);
                 const pct = Math.max(0, (calcSeconds / p.initialSeconds) * 100);
-                const barColor = isDanger ? 'var(--danger)' : (isWarning ? 'var(--primary)' : 'var(--success)');
-                const pressColor = isDanger ? 'color: var(--danger)' : (isWarning ? 'color: var(--primary)' : '');
+                
+                let barColor = 'var(--success)';
+                if (isWarning) barColor = 'var(--primary)';
+                if (isDanger) barColor = 'var(--danger)';
 
                 list.innerHTML += `
                     <div class="p-card ${status}">
-                        <div style="display:flex; justify-content:space-between; font-size:0.8rem">
-                            <strong>${p.name} (${p.regu})</strong><span>${p.lpm} LPM | ${p.vol} L</span>
+                        <div style="display:flex; justify-content:space-between; font-size:0.75rem; font-weight:bold;">
+                            <span>${p.name} (${p.regu})</span>
+                            <span>${p.lpm} LPM | ${p.vol}L</span>
                         </div>
-                        <div class="big-timer">${formatTime(p.secondsLeft)}</div>
+                        <div class="big-timer" style="${isDanger ? 'color: var(--danger);' : ''}">${formatTimeStyle(p.secondsLeft)}</div>
                         <div class="progress-bar"><div class="progress-fill" style="width: ${pct}%; background: ${barColor}"></div></div>
-                        <div class="stats-row">
-                            <div class="stat-box"><small>Masuk</small><span>${p.timeIn}</span></div>
+                        <div class="stats">
+                            <div class="stat-box"><small>Masuk</small>${p.timeIn}</div>
                             <div class="stat-box"><small>Keluar</small><span style="color:var(--danger)">${p.timeOut}</span></div>
-                            <div class="stat-box"><small>Awal</small><span>${p.press} B</span></div>
-                            <div class="stat-box"><small>Sisa</small><span style="${pressColor}; font-weight: ${isDanger || isWarning ? '900' : 'bold'};">${curPress} B</span></div>
+                            <div class="stat-box"><small>Awal</small>${p.press} B</div>
+                            <div class="stat-box"><small>Sisa</small><span style="font-weight:900; color:${barColor}">${curPress} B</span></div>
                         </div>
-                        <button class="btn btn-primary" style="background:var(--success); margin-top:10px;" onclick="finish(${p.id})">Selesai / Keluar</button>
+                        <button class="btn" style="background:#00e676; color:#000; padding:8px; margin-top:10px; font-size:0.75rem;" onclick="removePerson(${p.id})">Selesai / Keluar</button>
                     </div>
                 `;
             });
         }
 
-        function renderLogs() {
-            const body = document.getElementById('logBody');
-            body.innerHTML = '';
-            [...logs].reverse().forEach(l => {
-                body.innerHTML += `<tr>
-                    <td><strong>${l.name}</strong><br><span style="font-size:0.65rem; color:var(--text-dim)">${l.timeIn} - ${l.out}</span></td>
-                    <td>${l.regu}</td><td>${l.dur}m</td>
-                    <td><button class="btn-outline" onclick="deleteLog(${l.id})">Hapus</button></td>
-                </tr>`;
-            });
-        }
-
-        function formatTime(s) {
+        function formatTimeStyle(s) {
             const abs = Math.abs(s);
             const m = Math.floor(abs / 60);
             const sec = abs % 60;
-            return `${s < 0 ? '-' : ''}${m.toString().padStart(2,'0')}:${sec.toString().padStart(2,'0')}`;
+            return `${s < 0 ? '-' : ''}${m.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
         }
 
-        function finish(id) {
-            if(!confirm("Konfirmasi: Apakah personel telah keluar dengan aman?")) return;
-            const idx = persons.findIndex(p => p.id === id);
-            if(idx > -1) {
-                const p = persons[idx];
-                const actualDur = Math.floor((p.initialSeconds - Math.max(0, p.secondsLeft)) / 60);
-                logs.push({ id: p.id, name: p.name, regu: p.regu, timeIn: p.timeIn, out: getCurrentTime5(), dur: actualDur });
-                saveLogs();
-                persons.splice(idx, 1);
-                saveActivePersons(); render(); renderLogs();
-                if (persons.length === 0) {
-                    releaseWakeLock();
-                }
+        function removePerson(id) {
+            if (!confirm("Personel telah keluar dengan aman?")) return;
+            persons = persons.filter(p => p.id !== id);
+            
+            if (persons.length === 0) {
+                document.getElementById('iosKeepAlive').pause();
             }
+            render();
         }
 
-        function deleteLog(id) { 
-            logs = logs.filter(l => l.id !== id); 
-            saveLogs();
-            renderLogs(); 
-        }
-        
-        function clearLogs() { 
-            if(confirm("Apakah Anda yakin ingin menghapus semua riwayat?")) { 
-                logs = []; try{ localStorage.removeItem('sibaco_logs'); }catch(e){} renderLogs(); 
-            } 
-        }
-
-        function shareExcelToWA() {
-            if(logs.length === 0) return alert("Belum ada riwayat untuk diekspor.");
-            
-            let csvContent = "No,Nama Personel,Regu/Sektor,Waktu Masuk,Waktu Keluar,Durasi Operasi (Menit)\n";
-            [...logs].reverse().forEach((l, i) => { 
-                csvContent += `${i+1},${l.name},${l.regu},${l.timeIn},${l.out},${l.dur}\n`; 
-            });
-            
-            const blob = new Blob([csvContent], { type: 'text/csv' });
-            
-            const d = new Date();
-            const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-            
-            const fileName = `Laporan_Evakuasi_SIBACO_${today}.csv`;
-            const file = new File([blob], fileName, { type: 'text/csv' });
-
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                navigator.share({
-                    files: [file],
-                    title: 'Laporan SIBACO',
-                    text: 'Berikut adalah laporan evakuasi SCBA.'
-                }).catch(err => console.log('Share failed:', err));
-            } else {
-                const encodedUri = URL.createObjectURL(blob);
-                const link = document.createElement("a");
-                link.setAttribute("href", encodedUri);
-                link.setAttribute("download", fileName);
-                document.body.appendChild(link); 
-                link.click(); 
-                document.body.removeChild(link);
-                alert("File telah diunduh, silakan kirim ke WA secara manual.");
-            }
-        }
-
-        function triggerAlert() {
+        // Nada Sirine Melengking yang diputar terus-menerus setiap detik
+        function playiOSBeep() {
             try {
-                if(!audioCtx) unlockAudio();
-                if(audioCtx.state === 'suspended') audioCtx.resume();
+                if (!audioCtx) return;
+                if (audioCtx.state === 'suspended') audioCtx.resume();
                 
-                const tone = document.getElementById('alarmTone').value;
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
-                const now = audioCtx.currentTime;
-
-                let duration = 0.3;
-
-                if(tone === 'siren_panjang') { 
-                    duration = 4.0;
-                    osc.type = 'sawtooth'; 
-                    osc.frequency.setValueAtTime(600, now); 
-                    osc.frequency.linearRampToValueAtTime(1200, now + 1.0); 
-                    osc.frequency.linearRampToValueAtTime(600, now + 2.0);  
-                    osc.frequency.linearRampToValueAtTime(1200, now + 3.0); 
-                    osc.frequency.linearRampToValueAtTime(600, now + 4.0);  
-                }
-                else if(tone === 'siren') { 
-                    osc.type = 'sawtooth'; 
-                    osc.frequency.setValueAtTime(800, now); 
-                    osc.frequency.exponentialRampToValueAtTime(1600, now + 0.2); 
-                }
-                else if(tone === 'beep') { 
-                    osc.type = 'square'; 
-                    osc.frequency.setValueAtTime(1000, now); 
-                }
-                else { 
-                    osc.type = 'sine'; 
-                    osc.frequency.setValueAtTime(1500, now); 
-                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5); 
-                }
-
-                gain.gain.setValueAtTime(0.15, now);
-                osc.connect(gain); gain.connect(audioCtx.destination);
-                osc.start(); osc.stop(now + duration);
-
-                if ("vibrate" in navigator) {
-                    if(tone === 'siren_panjang') {
-                        navigator.vibrate([1000, 500, 1000, 500, 1000]); 
-                    } else {
-                        navigator.vibrate([200, 100, 200]); 
-                    }
-                }
-            } catch(e) { console.warn("Peringatan audio terblokir", e); }
+                
+                osc.type = 'sawtooth';
+                // Frekuensi dinaikkan agar melengking (Sirine)
+                osc.frequency.setValueAtTime(1000, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(2000, audioCtx.currentTime + 0.3);
+                
+                gain.gain.setValueAtTime(0.8, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+                
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.6);
+                
+                if (navigator.vibrate) navigator.vibrate([400, 200, 400]);
+            } catch(e) {}
         }
 
-        function testSound() { unlockAudio(); triggerAlert(); }
-
-        function updateActiveTimers() {
+        // Loop utama yang mengecek waktu setiap detik
+        setInterval(() => {
             if (persons.length === 0) return;
-
-            if (wakeLock === null && document.visibilityState === 'visible') {
-                requestWakeLock();
-            }
-
-            let alarm = false;
-            let oldOrder = persons.map(p => p.id).join(',');
-
-            persons.forEach(p => { 
-                p.secondsLeft--; 
-                if(p.secondsLeft <= 0) alarm = true; 
+            
+            let isAnyPersonInDanger = false;
+            
+            persons.forEach(p => {
+                const sisa = Math.ceil((p.targetTimeMs - Date.now()) / 1000);
+                
+                // Jika waktu habis, paksa alarm berbunyi TERUS-MENERUS
+                if (sisa <= 0) {
+                    isAnyPersonInDanger = true;
+                }
             });
 
-            persons.sort((a, b) => a.secondsLeft - b.secondsLeft);
-            let newOrder = persons.map(p => p.id).join(',');
-
-            if(alarm) triggerAlert();
-
-            if(document.querySelectorAll('.p-card').length !== persons.length || oldOrder !== newOrder) {
-                render();
-            } else {
-                const cards = document.querySelectorAll('.p-card');
-                persons.forEach((p, index) => {
-                    const card = cards[index];
-                    const timerEl = card.querySelector('.big-timer');
-                    const fillEl = card.querySelector('.progress-fill');
-                    const sisaPressEl = card.querySelectorAll('.stat-box span')[3]; 
-                    
-                    const isDanger = p.secondsLeft <= 0;
-                    const isWarning = p.secondsLeft > 0 && p.secondsLeft <= 300;
-                    
-                    card.className = `p-card ${isDanger ? 'danger' : (isWarning ? 'warning' : '')}`;
-                    timerEl.textContent = formatTime(p.secondsLeft);
-                    
-                    const calcSeconds = Math.max(0, p.secondsLeft); 
-                    const curPress = Math.max(p.margin, Math.floor((calcSeconds / p.initialSeconds) * (p.press - p.margin)) + p.margin);
-                    
-                    sisaPressEl.textContent = `${curPress} B`;
-                    sisaPressEl.style.color = isDanger ? 'var(--danger)' : (isWarning ? 'var(--primary)' : 'inherit');
-                    sisaPressEl.style.fontWeight = isDanger || isWarning ? '900' : 'bold';
-
-                    const pct = Math.max(0, (calcSeconds / p.initialSeconds) * 100);
-                    fillEl.style.width = `${pct}%`;
-                    fillEl.style.background = isDanger ? 'var(--danger)' : (isWarning ? 'var(--primary)' : 'var(--success)');
-                });
+            // Jika ada 1 saja personel yang limitnya habis, alarm berbunyi setiap detik
+            if (isAnyPersonInDanger) {
+                playiOSBeep();
             }
-            saveActivePersons();
-        }
 
-        setInterval(updateActiveTimers, 1000);
-
-        const derivedAppManifest = {
-            "name": "SIBACO",
-            "short_name": "SIBACO",
-            "display": "standalone",
-            "start_url": ".",
-            "background_color": "#0a1f33",
-            "theme_color": "#0a1f33",
-            "icons": [{
-                "src": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%230a1f33'/%3E%3Ctext x='96' y='25' text-anchor='middle' font-family='Inter, sans-serif' font-weight='900' font-size='22' fill='white'%3ESIBACO%3C/text%3E%3Cpath d='M96 160C108.6 160 120.3 155.6 130 148.6C139.7 141.6 147.4 132.6 153.2 122C159 111.4 162 99.7 162 88C162 76.3 159 64.6 153.2 54C147.4 43.4 139.7 34.4 130 27.4C120.3 20.4 108.6 16 96 16C83.4 16 71.7 20.4 62 27.4C52.3 34.4 44.6 43.4 38.8 54C33 64.6 30 76.3 30 88C30 99.7 33 111.4 38.8 122C44.6 132.6 52.3 141.6 62 148.6C71.7 155.6 83.4 160 96 160Z' fill='white' /%3E%3Ctext x='96' y='180' text-anchor='middle' font-family='Inter, sans-serif' font-size='9' fill='white'%3ESISTEM PAPAN KONTROL SCBA DIGITAL%3C/text%3E%3Crect x='0' y='50' width='192' height='5' fill='%232196f3'/%3E%3Crect x='0' y='55' width='192' height='5' fill='%23f44336'/%3E%3Crect x='0' y='60' width='192' height='5' fill='%2300e676'/%3E%3C/svg%3E",
-                "sizes": "192x192",
-                "type": "image/svg+xml",
-                "purpose": "maskable"
-            }]
-        };
-
-        const blob = new Blob([JSON.stringify(derivedAppManifest)], { type: 'application/json' });
-        const manifestURL = URL.createObjectURL(blob);
-        document.head.insertAdjacentHTML('beforeend', `<link rel="manifest" href="${manifestURL}">`);
+            render();
+        }, 1000);
     </script>
 </body>
 </html>
