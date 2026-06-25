@@ -165,7 +165,7 @@
             
             <div class="form-group">
                 <label>Batas Margin (Bar)</label>
-                <input type="number" inputmode="numeric" pattern="[0-9]*" id="marginSetting" value="50" min="20" max="100">
+                <input type="tel" inputmode="numeric" pattern="[0-9]*" id="marginSetting" value="50" min="20" max="100">
             </div>
             
             <div class="form-group full">
@@ -184,7 +184,7 @@
         <h2>➕ Data Personel</h2>
         <div class="grid-form">
             <div class="form-group"><label>Nama Personel</label><input type="text" id="name" placeholder="Contoh: Budi"></div>
-            <div class="form-group"><label>Regu / Sektor</label><input type="text" id="regu" placeholder="Contoh: Regu C / Sektor X Cipayung"></div>
+            <div class="form-group"><label>Regu / Sektor</label><input type="text" id="regu" placeholder="Contoh: Regu C / Sektor X"></div>
             
             <div class="form-group">
                 <label>Volume Tabung (L)</label>
@@ -209,7 +209,7 @@
 
             <div class="form-group full">
                 <label>Tekanan Awal (Bar)</label>
-                <input type="number" inputmode="numeric" pattern="[0-9]*" id="press" placeholder="Masukkan Tekanan (Min 50)" min="50" max="300">
+                <input type="tel" inputmode="numeric" pattern="[0-9]*" id="press" placeholder="Masukkan Tekanan (Min 50)">
                 <div style="display: flex; gap: 8px; margin-top: 6px;">
                     <button class="btn-outline preset-btn" onclick="document.getElementById('press').value=200">200 B</button>
                     <button class="btn-outline preset-btn" onclick="document.getElementById('press').value=250">250 B</button>
@@ -364,7 +364,6 @@
             try { localStorage.setItem('themeColor', hex); } catch(e){}
         }
 
-        // FUNGSI UNTUK MENAMPILKAN/MENYEMBUNYIKAN INPUT VOLUME MANUAL
         function toggleManualVol() {
             const volSelect = document.getElementById('vol');
             const volManual = document.getElementById('volManual');
@@ -376,7 +375,6 @@
             }
         }
 
-        // FUNGSI KEAMANAN UNTUK MENCEGAH XSS
         function escapeHTML(str) {
             if (!str) return "";
             return str.replace(/[&<>'"]/g, 
@@ -395,13 +393,11 @@
                 unlockAudio();
                 requestWakeLock();
 
-                // SANITASI INPUT MENGGUNAKAN escapeHTML
                 const name = escapeHTML(document.getElementById('name').value.trim());
                 const regu = escapeHTML(document.getElementById('regu').value.trim()) || "-";
                 
                 const press = parseInt(document.getElementById('press').value);
                 
-                // LOGIKA UNTUK MENENTUKAN VOLUME (Dropdown vs Manual)
                 let volVal = document.getElementById('vol').value;
                 let vol = volVal === 'manual' ? parseFloat(document.getElementById('volManual').value) : parseFloat(volVal);
 
@@ -417,7 +413,7 @@
                 if(!name || isNaN(press)) return alert("Harap lengkapi Nama dan Tekanan!");
                 if(press <= margin) return alert(`Tekanan terlalu rendah! Minimal harus di atas margin batas aman (${margin} Bar).`);
 
-                // Kalkulasi mundur berbasis rumus murni detik (Pure Countdown Logic)
+                // Kalkulasi mundur berbasis rumus detik murni
                 const totalSec = Math.floor(((press - margin) * vol) / lpm * 60);
                 const parts = timeIn.split(':').map(Number);
                 const h = parts[0] || 0;
@@ -427,7 +423,9 @@
 
                 persons.push({
                     id: Date.now(), name, regu, press, vol, lpm, margin, timeIn, timeOut,
-                    initialSeconds: totalSec, secondsLeft: totalSec 
+                    initialSeconds: totalSec, 
+                    targetEndTime: Date.now() + (totalSec * 1000), 
+                    secondsLeft: totalSec 
                 });
 
                 saveActivePersons();
@@ -526,10 +524,10 @@
             
             let csvContent = "No,Nama Personel,Regu/Sektor,Waktu Masuk,Waktu Keluar,Durasi Operasi (Menit)\n";
             [...logs].reverse().forEach((l, i) => { 
-                csvContent += `${i+1},${l.name},${l.regu},${l.timeIn},${l.out},${l.dur}\n`; 
+                csvContent += `${i+1},"${l.name}","${l.regu}",${l.timeIn},${l.out},${l.dur}\n`; 
             });
             
-            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             
             const d = new Date();
             const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -607,17 +605,8 @@
 
         function testSound() { unlockAudio(); triggerAlert(); }
 
-        // PERBAIKAN LOGIKA DELTA TIME PADA BACKGROUND TASK
-        let lastTick = Date.now();
-
         function updateActiveTimers() {
             const now = Date.now();
-            const deltaSeconds = Math.floor((now - lastTick) / 1000); 
-            
-            if (deltaSeconds < 1) return; 
-            
-            lastTick = now; 
-            
             if (persons.length === 0) return;
 
             if (wakeLock === null && document.visibilityState === 'visible') {
@@ -628,7 +617,11 @@
             let oldOrder = persons.map(p => p.id).join(',');
 
             persons.forEach(p => { 
-                p.secondsLeft -= deltaSeconds; 
+                if (!p.targetEndTime) {
+                    p.targetEndTime = now + (p.secondsLeft * 1000);
+                }
+                
+                p.secondsLeft = Math.floor((p.targetEndTime - now) / 1000); 
                 if(p.secondsLeft <= 0) alarm = true; 
             });
 
@@ -668,7 +661,7 @@
             saveActivePersons();
         }
 
-        setInterval(updateActiveTimers, 250);
+        setInterval(updateActiveTimers, 500);
 
         const derivedAppManifest = {
             "name": "SIBACO",
