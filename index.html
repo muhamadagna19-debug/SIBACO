@@ -44,7 +44,7 @@
 
         .settings-btn { cursor: pointer; padding: 8px; fill: var(--text-dim); transition: 0.2s; display: flex; align-items: center; justify-content: center; flex-shrink: 0;}
 
-        /* Styling Banner Peringatan Kompatibilitas */
+        /* Styling Banner Peringatan Kompatibilitas & Info */
         .warning-banner {
             background-color: rgba(255, 23, 68, 0.15);
             border: 1px solid var(--danger);
@@ -113,6 +113,16 @@
 
         .color-presets { display: flex; gap: 10px; margin-top: 5px; }
         .color-dot { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2px solid #fff; }
+
+        /* Animasi Berkedip Layar Penuh */
+        @keyframes strobeRed {
+            0% { background-color: var(--danger); }
+            50% { background-color: var(--bg-color); }
+            100% { background-color: var(--danger); }
+        }
+        body.alarm-strobe {
+            animation: strobeRed 0.5s infinite !important;
+        }
     </style>
 </head>
 <body>
@@ -138,6 +148,16 @@
             </div>
         </div>
     </header>
+
+    <div id="volumeWarningBanner" class="warning-banner" style="background-color: rgba(255, 160, 0, 0.15); border-color: var(--primary);">
+        <span style="color: var(--text);">🔊 <strong>Perhatian:</strong> Atur volume media perangkat Anda ke tingkat maksimal agar alarm evakuasi terdengar jelas!</span>
+        <button onclick="document.getElementById('volumeWarningBanner').style.display='none'" style="color: var(--primary);">×</button>
+    </div>
+
+    <div id="audioWarning" class="warning-banner" style="display: none; background-color: rgba(255, 160, 0, 0.15); border-color: var(--primary);">
+        <span style="color: var(--text);">🔇 <strong>Suara Diblokir:</strong> Ketuk layar sekali atau ubah nada alarm untuk mengaktifkan suara!</span>
+        <button onclick="document.getElementById('audioWarning').style.display='none'" style="color: var(--primary);">×</button>
+    </div>
 
     <div id="iosWarningBanner" class="warning-banner">
         <span>⚠️ <strong>SIBACO</strong> saat ini hanya untuk Android & Windows. Belum beroperasi penuh pada iOS.</span>
@@ -286,10 +306,23 @@
         } catch(e) { console.warn("Penyimpanan dibatasi", e); }
 
         function saveActivePersons() { 
-            try { localStorage.setItem('SIBACO_active', JSON.stringify(persons)); } catch(e) {} 
+            try { 
+                localStorage.setItem('SIBACO_active', JSON.stringify(persons)); 
+            } catch(e) {
+                if (e.name === 'QuotaExceededError') {
+                    alert("⚠️ Peringatan: Penyimpanan perangkat penuh! Data personel aktif gagal disimpan.");
+                }
+            } 
         }
+
         function saveLogs() { 
-            try { localStorage.setItem('SIBACO_logs', JSON.stringify(logs)); } catch(e) {} 
+            try { 
+                localStorage.setItem('SIBACO_logs', JSON.stringify(logs)); 
+            } catch(e) {
+                if (e.name === 'QuotaExceededError') {
+                    alert("⚠️ Peringatan: Penyimpanan riwayat penuh! Silakan 'Ekspor' dan 'Hapus' riwayat lama agar aplikasi berjalan lancar.");
+                }
+            } 
         }
 
         function getCurrentTime5() {
@@ -306,7 +339,11 @@
                     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 }
                 if (audioCtx.state === 'suspended') {
-                    audioCtx.resume();
+                    audioCtx.resume().catch(() => {
+                        document.getElementById('audioWarning').style.display = 'flex';
+                    });
+                } else {
+                    document.getElementById('audioWarning').style.display = 'none';
                 }
                 if (!silentSource) {
                     const buffer = audioCtx.createBuffer(1, 1, 22050);
@@ -432,12 +469,14 @@
                 let volVal = document.getElementById('vol').value;
                 let vol = volVal === 'manual' ? parseFloat(document.getElementById('volManual').value) : parseFloat(volVal);
 
-                if (isNaN(vol) || vol <= 0) return alert("Harap masukkan volume tabung yang valid!");
+                if (vol <= 0 || press <= 0) return alert("Kesalahan: Volume atau Tekanan tidak boleh bernilai 0 atau negatif!");
+                if (isNaN(vol)) return alert("Harap masukkan volume tabung yang valid!");
 
                 const lpm = parseInt(document.getElementById('lpm').value);
                 
-                let timeIn = document.getElementById('entryTime').value;
-                if(!timeIn || !timeIn.includes(':')) timeIn = getCurrentTime5();
+                // Waktu masuk langsung otomatis mengambil waktu rial-time perangkat saat tombol diklik
+                const timeIn = getCurrentTime5();
+                document.getElementById('entryTime').value = timeIn; 
                 
                 const margin = parseInt(document.getElementById('marginSetting').value) || 50;
 
@@ -618,7 +657,8 @@
                     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5); 
                 }
 
-                gain.gain.setValueAtTime(0.15, now);
+                // Volume 100% untuk web audio API
+                gain.gain.setValueAtTime(1.0, now);
                 osc.connect(gain); gain.connect(audioCtx.destination);
                 osc.start(); osc.stop(now + duration);
 
@@ -644,7 +684,10 @@
             
             lastTick = now; 
             
-            if (persons.length === 0) return;
+            if (persons.length === 0) {
+                document.body.classList.remove('alarm-strobe');
+                return;
+            }
 
             if (wakeLock === null && document.visibilityState === 'visible') {
                 requestWakeLock();
@@ -661,7 +704,13 @@
             persons.sort((a, b) => a.secondsLeft - b.secondsLeft);
             let newOrder = persons.map(p => p.id).join(',');
 
-            if(alarm) triggerAlert();
+            // Memicu Suara dan Layar Berkedip
+            if(alarm) {
+                triggerAlert();
+                document.body.classList.add('alarm-strobe');
+            } else {
+                document.body.classList.remove('alarm-strobe');
+            }
 
             if(document.querySelectorAll('.p-card').length !== persons.length || oldOrder !== newOrder) {
                 render();
