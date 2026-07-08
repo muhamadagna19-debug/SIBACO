@@ -44,6 +44,32 @@
 
         .settings-btn { cursor: pointer; padding: 8px; fill: var(--text-dim); transition: 0.2s; display: flex; align-items: center; justify-content: center; flex-shrink: 0;}
 
+        /* Styling Banner Peringatan Kompatibilitas */
+        .warning-banner {
+            background-color: rgba(255, 23, 68, 0.15);
+            border: 1px solid var(--danger);
+            color: var(--text);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        .warning-banner button {
+            background: none;
+            border: none;
+            color: var(--danger);
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 0 0 0 10px;
+            line-height: 1;
+        }
+
         #settingsDrawer, #infoDrawer { 
             display: none; background: var(--surface); border-radius: 12px; padding: 15px; 
             margin-bottom: 20px; border: 1px solid var(--border); animation: slideDown 0.3s ease-out;
@@ -87,32 +113,9 @@
 
         .color-presets { display: flex; gap: 10px; margin-top: 5px; }
         .color-dot { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2px solid #fff; }
-
-        /* Styling Modal Pop-up Kompatibilitas */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 9999; justify-content: center; align-items: center; }
-        .modal-content { background: var(--surface); color: var(--text); padding: 30px; border-radius: 12px; max-width: 350px; text-align: center; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.6); margin: 20px; }
-        .modal-header h2 { color: var(--danger); margin-top: 0; font-size: 1.4rem; }
-        .modal-body p { line-height: 1.6; margin-bottom: 15px; font-size: 0.95rem; color: var(--text-dim); }
-        .modal-body strong { color: var(--text); }
-        .modal-btn { background: var(--primary); color: #000000; border: none; padding: 12px 25px; font-weight: 900; border-radius: 8px; cursor: pointer; transition: background 0.2s; width: 100%; font-size: 1rem; }
-        .modal-btn:hover { background: #ffb300; }
     </style>
 </head>
 <body>
-
-    <!-- Modal Pop-up -->
-    <div id="iosWarningModal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>⚠️ Peringatan ⚠️  </h2>
-            </div>
-            <div class="modal-body">
-                <p>Saat ini, aplikasi <strong>SIBACO</strong> hanya bisa digunakan untuk perangkat <strong>Android</strong> dan <strong>Windows</strong>.</p>
-                <p>Aplikasi belum dapat beroperasi secara penuh pada perangkat iOS (iPhone/iPad).</p>
-            </div>
-            <button class="modal-btn" onclick="closeWarningModal()">Mengerti</button>
-        </div>
-    </div>
 
     <header>
         <div class="logo-area">
@@ -122,7 +125,7 @@
             
             <div style="display: flex; flex-direction: column; justify-content: center; margin-left: 2px;">
                 <span style="color: var(--primary); font-size: 1.1rem; font-weight: 900; line-height: 1;">SIBACO</span>
-                <span style="font-size: 0.45rem; color: var(--text-dim); letter-spacing: 0.5px; font-weight: bold; max-width: 130px; line-height: 1.2; margin-top: 2px;">SISTEM PAPAN KONTROL SCBA DIGITAL</span>
+                <span style="font-size: 0.45rem; color: var(--text-dim); letter-spacing: 0.5px; font-weight: bold; max-width: 130px; line-height: 1.2; margin-top: 2px;">SISTEM BREATHING APPARATUS CONTROL</span>
             </div>
         </div>
 
@@ -136,10 +139,15 @@
         </div>
     </header>
 
+    <div id="iosWarningBanner" class="warning-banner">
+        <span>⚠️ <strong>SIBACO</strong> saat ini hanya untuk Android & Windows. Belum beroperasi penuh pada iOS.</span>
+        <button onclick="document.getElementById('iosWarningBanner').style.display='none'">×</button>
+    </div>
+
     <div id="infoDrawer">
         <h2 style="margin:0 0 10px 0;">ℹ️ Tentang Aplikasi</h2>
         <div class="info-text">
-            <strong>SIBACO (Sistem Papan Kontrol SCBA Digital)</strong><br>
+            <strong>SIBACO (Sistem Breathing Apparatus Control)</strong><br>
             Versi: 1.1.0 (Rancangan Aktualisasi Latsar CPNS)<br><br>
             
             <strong>Pengembang:</strong><br>
@@ -268,14 +276,6 @@
     </div>
 
     <script>
-        function closeWarningModal() {
-            document.getElementById('iosWarningModal').style.display = 'none';
-        }
-
-        window.onload = function() {
-            document.getElementById('iosWarningModal').style.display = 'flex';
-        };
-
         document.addEventListener('contextmenu', event => event.preventDefault());
         
         let persons = [];
