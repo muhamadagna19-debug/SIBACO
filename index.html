@@ -70,11 +70,40 @@
             line-height: 1;
         }
 
-        #settingsDrawer, #infoDrawer { 
-            display: none; background: var(--surface); border-radius: 12px; padding: 15px; 
-            margin-bottom: 20px; border: 1px solid var(--border); animation: slideDown 0.3s ease-out;
-        }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- CSS MODAL POP-UP & ANIMASI BARU --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);
+            display: none; align-items: center; justify-content: center;
+            z-index: 9999; opacity: 0; transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            display: flex; opacity: 1;
+        }
+
+        .modal-content {
+            background: var(--surface); width: 90%; max-width: 400px;
+            border-radius: 16px; padding: 20px; position: relative;
+            border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transform: scale(0.9); opacity: 0; 
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-overlay.show .modal-content {
+            transform: scale(1); opacity: 1;
+        }
+
+        .close-btn {
+            position: absolute; top: 15px; right: 15px; background: none;
+            border: none; font-size: 1.5rem; color: var(--text-dim);
+            cursor: pointer; line-height: 1; transition: color 0.2s;
+            z-index: 10; padding: 5px;
+        }
+
+        .close-btn:hover { color: var(--danger); }
 
         .info-text { font-size: 0.8rem; color: var(--text-dim); line-height: 1.6; }
         .info-text strong { color: var(--text); }
@@ -88,15 +117,33 @@
         label { display: block; font-size: 0.65rem; color: var(--text-dim); margin-bottom: 3px; font-weight: bold; }
         input, select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text); font-size: 0.9rem; }
 
+        .btn, .preset-btn { 
+            transition: transform 0.1s ease, filter 0.2s ease, background 0.3s; 
+        }
+        .btn:active, .preset-btn:active { 
+            transform: scale(0.95); 
+        }
+
         .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-weight: 800; cursor: pointer; text-transform: uppercase; margin-top: 10px; font-size: 0.9rem; }
         .btn-primary { background: var(--primary); color: #000; }
         .btn-outline { background: none; border: 1px solid var(--text-dim); color: var(--text-dim); padding: 6px 12px; font-size: 0.7rem; width: auto; }
         .preset-btn { padding: 4px 8px; flex: 1; text-align: center; border-radius: 4px; border-color: var(--border); }
 
-        .p-card { background: var(--card-bg); border-radius: 15px; padding: 15px; border-left: 6px solid var(--success); margin-bottom: 12px; position: relative; transition: transform 0.2s; }
+        /* --- Animasi Sliding Down Baru --- */
+        .p-card { 
+            background: var(--card-bg); border-radius: 15px; padding: 15px; 
+            border-left: 6px solid var(--success); margin-bottom: 12px; position: relative; 
+            animation: cardSlideDown 0.4s ease-out forwards; 
+        }
         .p-card.warning { border-left-color: var(--primary); }
         .p-card.danger { border-left-color: var(--danger); animation: dangerPulse 0.5s infinite alternate; }
+        
+        @keyframes cardSlideDown {
+            from { opacity: 0; transform: translateY(-40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
         @keyframes dangerPulse { from { box-shadow: 0 0 0px transparent; } to { box-shadow: 0 0 15px var(--danger); background: #ff17441a; } }
+        /* ---------------------------------- */
 
         .big-timer { font-size: 3rem; font-weight: 900; text-align: center; margin: 5px 0; font-variant-numeric: tabular-nums; }
         
@@ -114,7 +161,6 @@
         .color-presets { display: flex; gap: 10px; margin-top: 5px; }
         .color-dot { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2px solid #fff; }
 
-        /* Animasi Berkedip Layar Penuh */
         @keyframes strobeRed {
             0% { background-color: var(--danger); }
             50% { background-color: var(--bg-color); }
@@ -140,10 +186,10 @@
         </div>
 
         <div style="display: flex; gap: 5px; flex-shrink: 0;">
-            <div class="settings-btn" onclick="toggleInfo()">
+            <div class="settings-btn" onclick="openModal('info')">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--text-dim)"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
             </div>
-            <div class="settings-btn" onclick="toggleSettings()">
+            <div class="settings-btn" onclick="openModal('settings')">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--text-dim)"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
             </div>
         </div>
@@ -164,68 +210,77 @@
         <button onclick="document.getElementById('iosWarningBanner').style.display='none'">×</button>
     </div>
 
-    <div id="infoDrawer">
-        <h2 style="margin:0 0 10px 0;">ℹ️ Tentang Aplikasi</h2>
-        <div class="info-text">
-            <strong>SIBACO (Sistem Breathing Apparatus Control)</strong><br>
-            Versi: 1.1.0 (Rancangan Aktualisasi Latsar CPNS)<br><br>
+    <!-- Wrapper Modal Pop-up -->
+    <div id="modalOverlay" class="modal-overlay" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="close-btn" onclick="closeModal()">×</button>
             
-            <strong>Pengembang:</strong><br>
-            Muhamad Agna Fadilah - Pemadam Kebakaran Pemula<br>
-            Sektor X Cipayung - Dinas Gulkarmat DKI Jakarta<br><br>
-            
-            <strong>Kontak & Bantuan:</strong><br>
-            Email: <a href="mailto:muhamadagna19@gmail.com" class="info-link">muhamadagna19@gmail.com</a><br>
-            WhatsApp: <a href="https://wa.me/6282117081059" target="_blank" class="info-link">0821-1708-1059</a>
-        </div>
-    </div>
-
-    <div id="settingsDrawer">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h2 style="margin:0">Pengaturan</h2>
-            <button class="btn-outline" onclick="toggleTheme()">🌓 Mode</button>
-        </div>
-        <div class="grid-form">
-            <div class="form-group">
-                <label>Ukuran Teks</label>
-                <div style="display: flex; gap: 5px;">
-                    <button class="btn-outline preset-btn" onclick="changeFontSize(-1)" style="font-weight: bold; font-size: 0.9rem;">A -</button>
-                    <button class="btn-outline preset-btn" onclick="changeFontSize(1)" style="font-weight: bold; font-size: 1.1rem;">A +</button>
+            <!-- Konten Informasi Aplikasi -->
+            <div id="infoModalContent" style="display: none;">
+                <h2 style="margin:0 0 15px 0; padding-right: 30px;">ℹ️ Tentang Aplikasi</h2>
+                <div class="info-text">
+                    <strong>SIBACO (Sistem Breathing Apparatus Control)</strong><br>
+                    Versi: 1.1.0 (Rancangan Aktualisasi Latsar CPNS)<br><br>
+                    
+                    <strong>Pengembang:</strong><br>
+                    Muhamad Agna Fadilah - Pemadam Kebakaran Pemula<br>
+                    Sektor X Cipayung - Dinas Gulkarmat DKI Jakarta<br><br>
+                    
+                    <strong>Kontak & Bantuan:</strong><br>
+                    Email: <a href="mailto:muhamadagna19@gmail.com" class="info-link">muhamadagna19@gmail.com</a><br>
+                    WhatsApp: <a href="https://wa.me/6282117081059" target="_blank" class="info-link">0821-1708-1059</a>
                 </div>
             </div>
 
-            <div class="form-group">
-                <label>Gaya Font</label>
-                <select id="fontStyle" onchange="changeFontFamily(this.value)">
-                    <option value="system-ui, -apple-system, sans-serif">Modern (Default)</option>
-                    <option value="Arial, Helvetica, sans-serif">Standar (Arial)</option>
-                    <option value="'Courier New', Courier, monospace">Digital (Mono)</option>
-                    <option value="Georgia, serif">Klasik (Serif)</option>
-                </select>
-            </div>
+            <!-- Konten Pengaturan -->
+            <div id="settingsModalContent" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-right: 30px;">
+                    <h2 style="margin:0">⚙️ Pengaturan</h2>
+                    <button class="btn-outline" onclick="toggleTheme()" style="padding: 4px 8px;">🌓 Mode</button>
+                </div>
+                <div class="grid-form">
+                    <div class="form-group">
+                        <label>Ukuran Teks</label>
+                        <div style="display: flex; gap: 5px;">
+                            <button class="btn-outline preset-btn" onclick="changeFontSize(-1)" style="font-weight: bold; font-size: 0.9rem;">A -</button>
+                            <button class="btn-outline preset-btn" onclick="changeFontSize(1)" style="font-weight: bold; font-size: 1.1rem;">A +</button>
+                        </div>
+                    </div>
 
-            <div class="form-group">
-                <label>Nada Alarm</label>
-                <select id="alarmTone" onchange="testSound()">
-                    <option value="siren_panjang">Sirine</option>
-                    <option value="siren">Alarm Elektronik</option>
-                    <option value="beep">Bip Standar</option>
-                    <option value="sonar">Pulsa Sonar</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label>Batas Margin (Bar)</label>
-                <input type="number" inputmode="numeric" pattern="[0-9]*" id="marginSetting" value="50" min="20" max="100">
-            </div>
-            
-            <div class="form-group full">
-                <label>Warna Aksen</label>
-                <div class="color-presets">
-                    <div class="color-dot" style="background: #ffa000;" onclick="changeColor('#ffa000')"></div>
-                    <div class="color-dot" style="background: #2196f3;" onclick="changeColor('#2196f3')"></div>
-                    <div class="color-dot" style="background: #00e676;" onclick="changeColor('#00e676')"></div>
-                    <div class="color-dot" style="background: #f44336;" onclick="changeColor('#f44336')"></div>
+                    <div class="form-group">
+                        <label>Gaya Font</label>
+                        <select id="fontStyle" onchange="changeFontFamily(this.value)">
+                            <option value="system-ui, -apple-system, sans-serif">Modern (Default)</option>
+                            <option value="Arial, Helvetica, sans-serif">Standar (Arial)</option>
+                            <option value="'Courier New', Courier, monospace">Digital (Mono)</option>
+                            <option value="Georgia, serif">Klasik (Serif)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nada Alarm</label>
+                        <select id="alarmTone" onchange="testSound()">
+                            <option value="siren_panjang">Sirine</option>
+                            <option value="siren">Alarm Elektronik</option>
+                            <option value="beep">Bip Standar</option>
+                            <option value="sonar">Pulsa Sonar</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Safety Margin (Bar)</label>
+                        <input type="number" inputmode="numeric" pattern="[0-9]*" id="marginSetting" value="50" min="20" max="100">
+                    </div>
+                    
+                    <div class="form-group full">
+                        <label>Warna Aksen</label>
+                        <div class="color-presets">
+                            <div class="color-dot" style="background: #ffa000;" onclick="changeColor('#ffa000')"></div>
+                            <div class="color-dot" style="background: #2196f3;" onclick="changeColor('#2196f3')"></div>
+                            <div class="color-dot" style="background: #00e676;" onclick="changeColor('#00e676')"></div>
+                            <div class="color-dot" style="background: #f44336;" onclick="changeColor('#f44336')"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -262,9 +317,9 @@
                 <label>Tekanan Awal (Bar)</label>
                 <input type="number" inputmode="numeric" pattern="[0-9]*" id="press" placeholder="Masukkan Tekanan (Min 50)" min="50" max="300">
                 <div style="display: flex; gap: 8px; margin-top: 6px;">
-                    <button class="btn-outline preset-btn" onclick="document.getElementById('press').value=200">200 B</button>
-                    <button class="btn-outline preset-btn" onclick="document.getElementById('press').value=250">250 B</button>
-                    <button class="btn-outline preset-btn" onclick="document.getElementById('press').value=300">300 B</button>
+                    <button class="btn-outline preset-btn" onclick="document.getElementById('press').value=200">200 Bar</button>
+                    <button class="btn-outline preset-btn" onclick="document.getElementById('press').value=250">250 Bar</button>
+                    <button class="btn-outline preset-btn" onclick="document.getElementById('press').value=300">300 Bar</button>
                 </div>
             </div>
 
@@ -395,6 +450,38 @@
         }
         renderLogs();
 
+        function openModal(type) {
+            const overlay = document.getElementById('modalOverlay');
+            const infoContent = document.getElementById('infoModalContent');
+            const settingsContent = document.getElementById('settingsModalContent');
+            
+            if (type === 'info') {
+                infoContent.style.display = 'block';
+                settingsContent.style.display = 'none';
+            } else {
+                infoContent.style.display = 'none';
+                settingsContent.style.display = 'block';
+            }
+            
+            overlay.style.display = 'flex';
+            setTimeout(() => {
+                overlay.classList.add('show');
+            }, 10);
+        }
+
+        function closeModal(event) {
+            if (event && event.target !== document.getElementById('modalOverlay') && event.target.className !== 'close-btn') {
+                return;
+            }
+            
+            const overlay = document.getElementById('modalOverlay');
+            overlay.classList.remove('show');
+            
+            setTimeout(() => {
+                overlay.style.display = 'none';
+            }, 300);
+        }
+
         function changeFontSize(step) {
             currentFontSize += step;
             if (currentFontSize < 12) currentFontSize = 12;
@@ -406,20 +493,6 @@
         function changeFontFamily(font) {
             document.documentElement.style.setProperty('--app-font', font);
             try { localStorage.setItem('SIBACO_fontFamily', font); } catch(e){}
-        }
-
-        function toggleSettings() {
-            const settings = document.getElementById('settingsDrawer');
-            const info = document.getElementById('infoDrawer');
-            if (info.style.display === 'block') info.style.display = 'none';
-            settings.style.display = settings.style.display === 'block' ? 'none' : 'block';
-        }
-
-        function toggleInfo() {
-            const info = document.getElementById('infoDrawer');
-            const settings = document.getElementById('settingsDrawer');
-            if (settings.style.display === 'block') settings.style.display = 'none';
-            info.style.display = info.style.display === 'block' ? 'none' : 'block';
         }
 
         function toggleTheme() {
@@ -474,7 +547,6 @@
 
                 const lpm = parseInt(document.getElementById('lpm').value);
                 
-                // Waktu masuk langsung otomatis mengambil waktu rial-time perangkat saat tombol diklik
                 const timeIn = getCurrentTime5();
                 document.getElementById('entryTime').value = timeIn; 
                 
@@ -483,7 +555,6 @@
                 if(!name || isNaN(press)) return alert("Harap lengkapi Nama dan Tekanan!");
                 if(press <= margin) return alert(`Tekanan terlalu rendah! Minimal harus di atas margin batas aman (${margin} Bar).`);
 
-                // Kalkulasi mundur berbasis rumus murni detik
                 const totalSec = Math.floor(((press - margin) * vol) / lpm * 60);
                 const parts = timeIn.split(':').map(Number);
                 const h = parts[0] || 0;
@@ -517,6 +588,7 @@
                 
                 const calcSeconds = Math.max(0, p.secondsLeft); 
                 const curPress = Math.max(p.margin, Math.floor((calcSeconds / p.initialSeconds) * (p.press - p.margin)) + p.margin);
+                
                 const pct = Math.max(0, (calcSeconds / p.initialSeconds) * 100);
                 const barColor = isDanger ? 'var(--danger)' : (isWarning ? 'var(--primary)' : 'var(--success)');
                 const pressColor = isDanger ? 'color: var(--danger)' : (isWarning ? 'color: var(--primary)' : '');
@@ -531,8 +603,8 @@
                         <div class="stats-row">
                             <div class="stat-box"><small>Masuk</small><span>${p.timeIn}</span></div>
                             <div class="stat-box"><small>Keluar</small><span style="color:var(--danger)">${p.timeOut}</span></div>
-                            <div class="stat-box"><small>Awal</small><span>${p.press} B</span></div>
-                            <div class="stat-box"><small>Sisa</small><span style="${pressColor}; font-weight: ${isDanger || isWarning ? '900' : 'bold'};">${curPress} B</span></div>
+                            <div class="stat-box"><small>Awal</small><span>${p.press} Bar</span></div>
+                            <div class="stat-box"><small>Sisa</small><span style="${pressColor}; font-weight: ${isDanger || isWarning ? '900' : 'bold'};">${curPress} Bar</span></div>
                         </div>
                         <button class="btn btn-primary" style="background:var(--success); margin-top:10px;" onclick="finish(${p.id})">Selesai / Keluar</button>
                     </div>
@@ -657,7 +729,6 @@
                     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5); 
                 }
 
-                // Volume 100% untuk web audio API
                 gain.gain.setValueAtTime(1.0, now);
                 osc.connect(gain); gain.connect(audioCtx.destination);
                 osc.start(); osc.stop(now + duration);
@@ -704,7 +775,6 @@
             persons.sort((a, b) => a.secondsLeft - b.secondsLeft);
             let newOrder = persons.map(p => p.id).join(',');
 
-            // Memicu Suara dan Layar Berkedip
             if(alarm) {
                 triggerAlert();
                 document.body.classList.add('alarm-strobe');
@@ -731,7 +801,7 @@
                     const calcSeconds = Math.max(0, p.secondsLeft); 
                     const curPress = Math.max(p.margin, Math.floor((calcSeconds / p.initialSeconds) * (p.press - p.margin)) + p.margin);
                     
-                    sisaPressEl.textContent = `${curPress} B`;
+                    sisaPressEl.textContent = `${curPress} Bar`;
                     sisaPressEl.style.color = isDanger ? 'var(--danger)' : (isWarning ? 'var(--primary)' : 'inherit');
                     sisaPressEl.style.fontWeight = isDanger || isWarning ? '900' : 'bold';
 
