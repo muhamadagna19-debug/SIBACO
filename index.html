@@ -616,9 +616,13 @@
             const body = document.getElementById('logBody');
             body.innerHTML = '';
             [...logs].reverse().forEach(l => {
+                const pAwal = l.pressAwal !== undefined ? l.pressAwal : '-';
+                const pAkhir = l.pressAkhir !== undefined ? l.pressAkhir : '-';
+                
                 body.innerHTML += `<tr>
                     <td><strong>${l.name}</strong><br><span style="font-size:0.65rem; color:var(--text-dim)">${l.timeIn} - ${l.out}</span></td>
-                    <td>${l.regu}</td><td>${l.dur}m</td>
+                    <td>${l.regu}</td>
+                    <td>${l.dur}m<br><span style="font-size:0.65rem; color:var(--text-dim)">${pAwal} ➔ ${pAkhir} Bar</span></td>
                     <td><button class="btn-outline" onclick="deleteLog(${l.id})">Hapus</button></td>
                 </tr>`;
             });
@@ -637,7 +641,21 @@
             if(idx > -1) {
                 const p = persons[idx];
                 const actualDur = Math.floor((p.initialSeconds - Math.max(0, p.secondsLeft)) / 60);
-                logs.push({ id: p.id, name: p.name, regu: p.regu, timeIn: p.timeIn, out: getCurrentTime5(), dur: actualDur });
+                
+                const calcSeconds = Math.max(0, p.secondsLeft); 
+                const curPress = Math.max(p.margin, Math.floor((calcSeconds / p.initialSeconds) * (p.press - p.margin)) + p.margin);
+
+                logs.push({ 
+                    id: p.id, 
+                    name: p.name, 
+                    regu: p.regu, 
+                    timeIn: p.timeIn, 
+                    out: getCurrentTime5(), 
+                    dur: actualDur,
+                    pressAwal: p.press,
+                    pressAkhir: curPress
+                });
+                
                 saveLogs();
                 persons.splice(idx, 1);
                 saveActivePersons(); render(); renderLogs();
@@ -662,9 +680,13 @@
         function shareExcelToWA() {
             if(logs.length === 0) return alert("Belum ada riwayat untuk diekspor.");
             
-            let csvContent = "No,Nama Personel,Regu/Sektor,Waktu Masuk,Waktu Keluar,Durasi Operasi (Menit)\n";
+            let csvContent = "No,Nama Personel,Regu/Sektor,Waktu Masuk,Waktu Keluar,Durasi Operasi (Menit),Tekanan Awal (Bar),Tekanan Akhir (Bar)\n";
+            
             [...logs].reverse().forEach((l, i) => { 
-                csvContent += `${i+1},${l.name},${l.regu},${l.timeIn},${l.out},${l.dur}\n`; 
+                const pAwal = l.pressAwal !== undefined ? l.pressAwal : '-';
+                const pAkhir = l.pressAkhir !== undefined ? l.pressAkhir : '-';
+                
+                csvContent += `${i+1},${l.name},${l.regu},${l.timeIn},${l.out},${l.dur},${pAwal},${pAkhir}\n`; 
             });
             
             const blob = new Blob([csvContent], { type: 'text/csv' });
